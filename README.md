@@ -11,7 +11,7 @@ NPM:
 
 https://github.com/XRPL-Labs/XummPkce/blob/main/sample/index.html
 
-### CDN (browser) -- TODO:
+### CDN (browser):
 
 A browserified version (latest) is available at [JSDelivr](https://cdn.jsdelivr.net/npm/xumm-oauth2-pkce/dist/browser.min.js) & direclty from the `xumm.app` domain:
 
