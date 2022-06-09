@@ -12,27 +12,6 @@
 
     <script src="https://xumm.app/assets/cdn/xumm-sdk.min.js"></script>
     <script src="/dist/browser.min.js"></script>
-
-    <script>
-      var auth = new XummPkce('8525e32b-1bd0-4839-af2f-f794874a80b0')
-
-      function go() {
-        return auth
-          .authorize()
-          .then(authorized => {
-            console.log('Authorized', authorized.jwt, authorized.me)
-            authorized
-              .sdk
-              .ping()
-              .then(pong => {
-                console.log({pong})
-              })
-          })
-          .catch(e => {
-            console.log('Auth error', e)
-          })
-        }
-    </script>
   </head>
   <body>
     <div class="container mt-2">
@@ -46,10 +25,62 @@
       <div class="mt-4 card shadow">
         <div class="card-body">
           <div class="py-3 text-center">
-            <button onclick="go()" class="btn btn-outline-primary">Sign in</button>
+            <div class="alert alert-danger" id="error">...</div>
+            <button id="signinbtn" onclick="go()" class="btn btn-outline-primary">...</button>
+            <div class="alert alert-success" id="signedin">Signed in :)</div>
+            <pre style="text-align: left; display: none;" id="results">...</pre>
           </div>
         </div>
       </div>
     </div>
+
+    <script>
+      var auth = new XummPkce('8525e32b-1bd0-4839-af2f-f794874a80b0')
+
+      var signinbtn = document.getElementById('signinbtn')
+
+      function reset() {
+        signinbtn.innerText = 'Sign in'
+        document.getElementById('signedin').style.display = 'none'
+        document.getElementById('error').style.display = 'none'
+      }
+
+      reset()
+
+      function go() {
+        signinbtn.innerText = 'Signing in...'
+
+        return auth
+          .authorize()
+          .then(authorized => {
+            reset()
+
+            console.log('Authorized', authorized.jwt, authorized.me)
+            signinbtn.style.display = 'none'
+
+            document.getElementById('signedin').style.display = 'block'
+
+            var resultspre = document.getElementById('results')
+
+            resultspre.style.display = 'block'
+            resultspre.innerText = JSON.stringify(authorized.me, null, 2)
+
+            authorized
+              .sdk
+              .ping()
+              .then(pong => {
+                console.log({pong})
+              })
+          })
+          .catch(e => {
+            console.log('Auth error', e)
+
+            reset()
+
+            document.getElementById('error').style.display = 'block'
+            document.getElementById('error').innerText = e.message
+          })
+        }
+    </script>
   </body>
 </html>
