@@ -7,7 +7,7 @@ localStorage.debug = "xummpkce*";
 Debug.log = console.log.bind(console);
 const log = Debug("xummpkce");
 
-log("Xumm OAuth2 PKCE Implicit Flow lib.");
+log("Xumm OAuth2 PKCE Authorization Code Flow lib.");
 
 interface ResolvedFlow {
   sdk: XummSdkJwt;

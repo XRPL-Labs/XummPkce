@@ -62,7 +62,8 @@
     "pkce",
     "oauth2",
     "client",
-    "implicit",
+    "authorization",
+    "flow",
     "auth"
   ],
   "nodemonConfig": {
