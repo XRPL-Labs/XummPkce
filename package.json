@@ -8,6 +8,7 @@
     "prepare": "npm run clean && npm run lint && npm run test && npm run build && npm run browserify",
     "clean": "rm -rf dist",
     "build": "tsc",
+    "buildsample": "npm run build && npm run browserify && npm run minify && mkdir -p sample/dist; cp dist/browser.min.js sample/dist/",
     "serve": "npm run build && npm run browserify && serve -C -n -p 3001 ./",
     "watch": "tsc -w",
     "inspect": "clear && npm run build && node --inspect dist/samples/sample.js",
