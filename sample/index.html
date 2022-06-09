@@ -35,18 +35,40 @@
     </div>
 
     <script>
+      /**
+       * Construct & handle async (mobile)
+       **/
       var auth = new XummPkce('8525e32b-1bd0-4839-af2f-f794874a80b0')
 
+      auth.on('result', event => {
+        // Redirect, e.g. mobile. Pretend the Sign In btn was clicked and handle accordingly
+        alert('RESULT')
+        go()
+      })
+
+      /**
+       * UI stuff
+       **/
       var signinbtn = document.getElementById('signinbtn')
 
       function reset() {
         signinbtn.innerText = 'Sign in'
-        document.getElementById('signedin').style.display = 'none'
-        document.getElementById('error').style.display = 'none'
+        document
+          .getElementById('signedin')
+          .style
+          .display = 'none'
+        document
+          .getElementById('error')
+          .style
+          .display = 'none'
       }
 
+      // Start in default UI state
       reset()
 
+      /**
+       * Fn to deal with a "Sign In" button click or redirect
+       **/
       function go() {
         signinbtn.innerText = 'Signing in...'
 
@@ -55,10 +77,13 @@
           .then(authorized => {
             reset()
 
-            console.log('Authorized', authorized.jwt, authorized.me)
+            alert('Authorized', authorized.jwt, authorized.me)
             signinbtn.style.display = 'none'
 
-            document.getElementById('signedin').style.display = 'block'
+            document
+              .getElementById('signedin')
+              .style
+              .display = 'block'
 
             var resultspre = document.getElementById('results')
 
@@ -69,16 +94,21 @@
               .sdk
               .ping()
               .then(pong => {
-                console.log({pong})
+                alert({pong})
               })
           })
           .catch(e => {
-            console.log('Auth error', e)
+            alert('Auth error', e)
 
             reset()
 
-            document.getElementById('error').style.display = 'block'
-            document.getElementById('error').innerText = e.message
+            document
+              .getElementById('error')
+              .style
+              .display = 'block'
+            document
+              .getElementById('error')
+              .innerText = e.message
           })
         }
     </script>
