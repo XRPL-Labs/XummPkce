@@ -7,6 +7,7 @@
     <title>Xumm PKCE Sample</title>
 
     <script>
+      // To see logging/debug messages in your console
       localStorage.debug = '*'
     </script>
 
@@ -41,8 +42,11 @@
       var auth = new XummPkce('8525e32b-1bd0-4839-af2f-f794874a80b0')
 
       auth.on('result', event => {
-        // Redirect, e.g. mobile. Pretend the Sign In btn was clicked and handle accordingly
-        alert('RESULT')
+        // Redirect, e.g. mobile. Mobile may return to new tab, this
+        // handles the same logic (re-inits the auth Promise) normally
+        // triggered by e.g. a button.
+        //   > Note: it emulates without opening another auth window ;)
+        console.log('Results are in, mobile flow, emulate auth trigger')
         go()
       })
 
@@ -53,14 +57,8 @@
 
       function reset() {
         signinbtn.innerText = 'Sign in'
-        document
-          .getElementById('signedin')
-          .style
-          .display = 'none'
-        document
-          .getElementById('error')
-          .style
-          .display = 'none'
+        document.getElementById('signedin').style.display = 'none'
+        document.getElementById('error').style.display = 'none'
       }
 
       // Start in default UI state
@@ -70,20 +68,16 @@
        * Fn to deal with a "Sign In" button click or redirect
        **/
       function go() {
+        reset()
         signinbtn.innerText = 'Signing in...'
 
         return auth
           .authorize()
           .then(authorized => {
-            reset()
-
-            alert('Authorized', authorized.jwt, authorized.me)
+            console.log('Authorized', authorized.jwt, authorized.me)
             signinbtn.style.display = 'none'
 
-            document
-              .getElementById('signedin')
-              .style
-              .display = 'block'
+            document.getElementById('signedin').style.display = 'block'
 
             var resultspre = document.getElementById('results')
 
@@ -94,21 +88,16 @@
               .sdk
               .ping()
               .then(pong => {
-                alert({pong})
+                console.log({pong})
               })
           })
           .catch(e => {
-            alert('Auth error', e)
+            console.log('Auth error', e)
 
             reset()
 
-            document
-              .getElementById('error')
-              .style
-              .display = 'block'
-            document
-              .getElementById('error')
-              .innerText = e.message
+            document.getElementById('error').style.display = 'block'
+            document.getElementById('error').innerText = e.message
           })
         }
     </script>

@@ -6,10 +6,12 @@ import PKCE from "js-pkce";
 localStorage.debug = "xummpkce*";
 
 Debug.log = console.log.bind(console);
-// const log = Debug("xummpkce");
-const log = (...args: any[]) => {
-  alert(args.map((a) => JSON.stringify(a, null, 2)).join(" "));
-};
+const log = Debug("xummpkce");
+
+// If everything else fails:
+// const log = (...args: any[]) => {
+//   alert(args.map((a) => JSON.stringify(a, null, 2)).join(" "));
+// };
 
 log("Xumm OAuth2 PKCE Authorization Code Flow lib.");
 
@@ -105,8 +107,6 @@ export class XummPkce extends EventEmitter {
                   .exchangeForAccessToken(postMessage.options.full_redirect_uri)
                   .then((resp) => {
                     this.jwt = resp.access_token;
-
-                    log("exchangeForAccessToken resp", resp);
 
                     if ((resp as any)?.error_description) {
                       throw new Error((resp as any)?.error_description);
@@ -207,7 +207,8 @@ export class XummPkce extends EventEmitter {
         ),
         origin: "https://oauth2.xumm.app",
       };
-      log(messageEventData);
+
+      // log(messageEventData);
       const event = new MessageEvent("message", messageEventData);
       window.dispatchEvent(event);
       return true;
@@ -217,15 +218,16 @@ export class XummPkce extends EventEmitter {
 
   public async authorize() {
     if (!this.mobileRedirectFlow) {
+      const url = this.authorizeUrl();
       const popup = window.open(
-        this.authorizeUrl(),
+        url,
         "XummPkceLogin",
         "directories=no,titlebar=no,toolbar=no,location=no,status=no," +
           "menubar=no,scrollbars=no,resizable=no,width=600,height=790"
       );
 
       this.popup = popup;
-      log("Popup opened...");
+      log("Popup opened...", url);
     }
 
     this.promise = new Promise((resolve, reject) => {
