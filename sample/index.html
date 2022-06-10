@@ -11,7 +11,6 @@
       localStorage.debug = '*'
     </script>
 
-    <script src="https://xumm.app/assets/cdn/xumm-sdk.min.js"></script>
     <script src="/dist/browser.min.js"></script>
   </head>
   <body>
@@ -44,7 +43,7 @@
       /**
        * Construct & handle async (mobile)
        **/
-      var auth = new XummPkce('8525e32b-1bd0-4839-af2f-f794874a80b0')
+      var auth = new XummPkce('47d328db-0b34-4451-a258-393480c9b4cd')
 
       auth.on('result', event => {
         // Redirect, e.g. mobile. Mobile may return to new tab, this
