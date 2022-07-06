@@ -30,6 +30,7 @@
             <button id="signinbtn" onclick="go()" class="btn btn-outline-primary">...</button>
             <div class="alert alert-success" id="signedin">Signed in :)</div>
             <pre style="text-align: left; display: none;" id="results">...</pre>
+            <button style="display: none;" id="trypayload" onclick="go_payload()" class="btn btn-primary">Now try a Sign Request</button>
           </div>
         </div>
       </div>
@@ -44,6 +45,7 @@
        * Construct & handle async (mobile)
        **/
       var auth = new XummPkce('47d328db-0b34-4451-a258-393480c9b4cd')
+      var sdk = null
 
       auth.on('result', event => {
         // Redirect, e.g. mobile. Mobile may return to new tab, this
@@ -63,6 +65,7 @@
         signinbtn.innerText = 'Sign in'
         document.getElementById('signedin').style.display = 'none'
         document.getElementById('error').style.display = 'none'
+        document.getElementById('trypayload').style.display = 'none'
       }
 
       // Start in default UI state
@@ -78,7 +81,10 @@
         return auth
           .authorize()
           .then(authorized => {
-            console.log('Authorized', authorized.jwt, authorized.me)
+            // Assign to global, please don't do this but for the sake of the demo it's easy
+            sdk = authorized.sdk
+
+            console.log('Authorized', /* authorized.jwt, */ authorized.me)
             signinbtn.style.display = 'none'
 
             document.getElementById('signedin').style.display = 'block'
@@ -87,13 +93,9 @@
 
             resultspre.style.display = 'block'
             resultspre.innerText = JSON.stringify(authorized.me, null, 2)
+            document.getElementById('trypayload').style.display = 'block'
 
-            authorized
-              .sdk
-              .ping()
-              .then(pong => {
-                console.log({pong})
-              })
+            sdk.ping().then(pong => console.log({pong}))
           })
           .catch(e => {
             console.log('Auth error', e)
@@ -103,7 +105,39 @@
             document.getElementById('error').style.display = 'block'
             document.getElementById('error').innerText = e.message
           })
+      }
+
+      function go_payload() {
+        // https://www.npmjs.com/package/xumm-sdk
+
+        var payload = {
+          txjson: {
+            TransactionType: 'Payment',
+            Destination: 'rwietsevLFg8XSmG3bEZzFein1g8RBqWDZ',
+            Amount: '1000000' // 1 XRP
+          }
         }
+
+        sdk.payload.createAndSubscribe(payload, function (payloadEvent) {
+          if (typeof payloadEvent.data.signed !== 'undefined') {
+            // What we return here will be the resolved value of the `resolved` property
+            return payloadEvent.data
+          }
+        }).then(function ({created, resolved}) {
+          if (created.pushed) {
+            alert('Now check Xumm, there should be a push notification + sign request in your event list waiting for you ;)')
+          } else {
+            alert('Now check Xumm, there should be a sign request in your event list waiting for you ;) (This would have been pushed, but it seems you did not grant Xumm the push permission)')
+          }
+
+          resolved.then(function (payloadOutcome) {
+            alert('Payload ' + (payloadOutcome.signed ? 'signed' : 'rejected') + ', see the browser console for more info')
+            console.log(payloadOutcome)
+          })
+        }).catch(function (payloadError) {
+          alert('Paylaod error', e.message)
+        })
+      }
     </script>
   </body>
 </html>
