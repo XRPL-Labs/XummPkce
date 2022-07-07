@@ -78,7 +78,7 @@ export class XummPkce extends EventEmitter {
       "message",
       (event) => {
         log("Received Event from ", event.origin);
-        if (event.data.slice(0, 1) === "{" && event.data.slice(-1) === "}") {
+        if (String(event?.data || '').slice(0, 1) === "{" && String(event?.data || '').slice(-1) === "}") {
           log("Got PostMessage with JSON");
           if (
             event.origin === "https://xumm.app" ||
