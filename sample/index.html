@@ -146,7 +146,7 @@
           }
 
           resolved.then(function (payloadOutcome) {
-            alert('Payload ' + (payloadOutcome.signed ? 'signed' : 'rejected') + ', see the browser console for more info')
+            alert('Payload ' + (payloadOutcome.signed ? 'signed (TX Hash: ' + payloadOutcome.txid + ')' : 'rejected') + ', see the browser console for more info')
             console.log(payloadOutcome)
           })
         }).catch(function (payloadError) {
