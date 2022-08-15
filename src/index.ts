@@ -15,21 +15,25 @@ const log = Debug("xummpkce");
 
 log("Xumm OAuth2 PKCE Authorization Code Flow lib.");
 
-interface ResolvedFlow {
+export { XummSdkJwt };
+
+export interface Me {
+  sub: string;
+  picture: string;
+  account: string;
+  name?: string;
+  domain?: string;
+  blocked: boolean;
+  source: string;
+  kycApproved: boolean;
+  proSubscription: boolean;
+};
+
+export interface ResolvedFlow {
   sdk: XummSdkJwt;
   jwt: string;
-  me: {
-    sub: string;
-    picture: string;
-    account: string;
-    name?: string;
-    domain?: string;
-    blocked: boolean;
-    source: string;
-    kycApproved: boolean;
-    proSubscription: boolean;
-  };
-}
+  me: Me;
+};
 
 export interface XummPkceEvent {
   // Result returns nothing, just a trigger, the authorize() method should be called later to handle based on Promise()
