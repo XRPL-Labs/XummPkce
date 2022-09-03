@@ -12,19 +12,17 @@
     </script>
 
     <!--
-      NPM (JS/TS): 
-        https://www.npmjs.com/package/xumm-oauth2-pkce
-      CDN: 
-        <script src="https://xumm.app/assets/cdn/xumm-oauth2-pkce.min.js"></script>
-      Local:
+      NPM (JS/TS): https://www.npmjs.com/package/xumm-oauth2-pkce
     -->
-    <script src="/dist/browser.min.js"></script>
+    <script src="https://xumm.app/assets/cdn/xumm-oauth2-pkce.min.js"></script>
   </head>
   <body>
     <div class="container mt-2">
       <h2>Hello, world!</h2>
       <p class="alert alert-primary mb-2">
-        This page shows the OAuth2 Implicit PKCE flow JS lib. for the Xumm platform / ecosystem.
+        <span class="h5 d-inline-block mb-2">This is <q><b>Web3</b> wallet <b>identity</b> &amp; <b>transaction initiation</b></q> for the XRP Ledger ecosystem.</span>
+        <br />
+        Tech under the hood: OAuth2 Implicit PKCE flow for the Xumm platform and XRP Ledger ecosystem.
         <b>Using nothing but simple client side Javascript: <a href="https://github.com/XRPL-Labs/XummPkce/blob/main/sample/index.html" target="_blank">source</a></b>.
       </p>
       <div class="text-end py-0 my-0">
@@ -128,8 +126,8 @@
         var payload = {
           txjson: {
             TransactionType: 'Payment',
-            Destination: 'rwietsevLFg8XSmG3bEZzFein1g8RBqWDZ',
-            Amount: '1000000' // 1 XRP
+            Destination: 'rfCarbonVNTuXckX6x2qTMFmFSnm6dEWGX',
+            Amount: '1337' // Drops, so: 0.001337 XRP
           }
         }
 
