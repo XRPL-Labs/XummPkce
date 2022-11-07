@@ -37,9 +37,9 @@ interface ResolvedFlow {
 }
 
 export interface XummPkceEvent {
-  // Result returns nothing, just a trigger, the authorize() method should be called later to handle based on Promise()
-  // result: (data: ResolvedFlow) => void;
-  result: () => void;
+  // `retrieved` returns nothing, just a trigger, the authorize()
+  // method should be called later to handle based on Promise()
+  retrieved: () => void;
 }
 
 export declare interface XummPkce {
@@ -133,7 +133,7 @@ export class XummPkce extends EventEmitter {
             if (pong?.jwtData?.sub) {
               // Yay, user still signed in, JWT still valid!
               this.autoResolvedFlow = Object.assign(existingJwt, { sdk });
-              this.emit("result");
+              this.emit("retrieved");
             } else {
               this.logout();
             }
@@ -275,7 +275,7 @@ export class XummPkce extends EventEmitter {
         if (document.readyState === "complete") {
           log("(readystatechange: [ " + document.readyState + " ])");
           this.handleMobileGrant();
-          this.emit("result");
+          this.emit("retrieved");
         }
       });
     }

@@ -56,7 +56,7 @@
       var auth = new XummPkce('47d328db-0b34-4451-a258-393480c9b4cd')
       var sdk = null
 
-      auth.on('result', event => {
+      auth.on('retrieved', event => {
         // Redirect, e.g. mobile. Mobile may return to new tab, this
         // handles the same logic (re-inits the auth Promise) normally
         // triggered by e.g. a button.
