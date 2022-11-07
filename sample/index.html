@@ -38,6 +38,7 @@
             <button id="signinbtn" onclick="go()" class="btn btn-outline-primary">...</button>
             <div class="alert alert-success" id="signedin">Signed in :)</div>
             <pre style="text-align: left; display: none;" id="results">...</pre>
+            <button style="display: none; float: right;" id="logout" onclick="go_logout()" class="btn btn-danger">Logout</button>
             <button style="display: none;" id="trypayload" onclick="go_payload()" class="btn btn-primary">Now try a Sign Request</button>
           </div>
         </div>
@@ -74,6 +75,8 @@
         document.getElementById('signedin').style.display = 'none'
         document.getElementById('error').style.display = 'none'
         document.getElementById('trypayload').style.display = 'none'
+        document.getElementById('logout').style.display = 'none'
+        document.getElementById('results').style.display = 'none'
       }
 
       // Start in default UI state
@@ -102,6 +105,7 @@
             resultspre.style.display = 'block'
             resultspre.innerText = JSON.stringify(authorized.me, null, 2)
             document.getElementById('trypayload').style.display = 'block'
+            document.getElementById('logout').style.display = 'block'
 
             sdk.ping().then(pong => console.log({pong}))
           })
@@ -115,6 +119,12 @@
           })
       }
 
+      function go_logout() {
+        auth.logout()
+        reset()
+        signinbtn.style.display = 'inline-block'
+      }
+
       function go_payload() {
         /**
           * xumm-oauth2-pkce package returns `sdk` property, 
@@ -122,7 +132,6 @@
           * Xumm SDK methods, docs:
           *      https://www.npmjs.com/package/xumm-sdk
           **/
-
         var payload = {
           txjson: {
             TransactionType: 'Payment',
