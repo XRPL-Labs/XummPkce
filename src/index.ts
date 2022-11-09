@@ -127,18 +127,24 @@ export class XummPkce extends EventEmitter {
 
         if (existingJwt?.jwt && typeof existingJwt.jwt === "string") {
           const sdk = new XummSdkJwt(existingJwt.jwt);
-          sdk.ping().then(async (pong) => {
-            /**
-             * Pretend mobile so no window.open is triggered
-             */
-            if (pong?.jwtData?.sub) {
-              // Yay, user still signed in, JWT still valid!
-              this.autoResolvedFlow = Object.assign(existingJwt, { sdk });
-              this.emit("retrieved");
-            } else {
+          sdk
+            .ping()
+            .then(async (pong) => {
+              /**
+               * Pretend mobile so no window.open is triggered
+               */
+              if (pong?.jwtData?.sub) {
+                // Yay, user still signed in, JWT still valid!
+                this.autoResolvedFlow = Object.assign(existingJwt, { sdk });
+                this.emit("retrieved");
+              } else {
+                this.logout();
+              }
+            })
+            .catch((e) => {
+              // That didn't work
               this.logout();
-            }
-          });
+            });
         }
       } catch (e) {
         // Do nothing
