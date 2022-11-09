@@ -11,6 +11,10 @@ NPM:
 
 ## Sample:
 
+#### Event based sample
+
+##### See [this example](https://github.com/XRPL-Labs/XummPkce/blob/main/sample/jsmodule.html) :)
+
 #### Promise based sample
 
 ```javascript
@@ -36,10 +40,6 @@ document.getElementById("somebutton").onclick = () => {
   });
 };
 ```
-
-#### Event based sample
-
-See [this example](https://github.com/XRPL-Labs/XummPkce/blob/main/sample/jsmodule.html) :)
 
 ### CDN (browser):
 
