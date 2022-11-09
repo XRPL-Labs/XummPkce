@@ -13,8 +13,9 @@
 
     <!--
       NPM (JS/TS): https://www.npmjs.com/package/xumm-oauth2-pkce
+      CDN:         <script src="https://xumm.app/assets/cdn/xumm-oauth2-pkce.min.js"></script>
     -->
-    <script src="https://xumm.app/assets/cdn/xumm-oauth2-pkce.min.js?2"></script>
+    <script src="https://xumm.app/assets/cdn/xumm-oauth2-pkce.min.js"></script>
   </head>
   <body>
     <div class="container mt-2">
@@ -57,8 +58,8 @@
 
       <div class="mt-5 pt-2 pb-2 border-top border-1 border-muted text-end">
         <small>
-          <a href="https://github.com/XRPL-Labs/XummPkce/blob/main/sample/index.html" target="_blank">Source on Github (this page)</a>
-          <a href="https://github.com/XRPL-Labs/XummPkce/blob/main/sample/jsmodule.html" target="_blank">Minimal MJS Event based sample</a>
+          <a href="https://github.com/XRPL-Labs/XummPkce/blob/main/sample/index.html" target="_blank">Source on Github</a> /
+          <a href="https://github.com/XRPL-Labs/XummPkce/blob/main/sample/jsmodule.html" target="_blank">Event based sample</a>
         </small>
       </div>
     </div>
@@ -70,40 +71,51 @@
       var auth = new XummPkce('47d328db-0b34-4451-a258-393480c9b4cd')
       var sdk = null
 
+      function signedInHandler (authorized) {
+        // Assign to global,
+        // please don't do this but for the sake of the demo it's easy
+        sdk = authorized.sdk
+
+        console.log('Authorized', /* authorized.jwt, */ authorized.me)
+
+        signinbtn.style.display = 'none'
+        document.getElementById('signedin').style.display = 'block'
+
+        var resultspre = document.getElementById('results')
+
+        resultspre.style.display = 'block'
+        resultspre.innerText = JSON.stringify(authorized.me, null, 2)
+        document.getElementById('trypayload').style.display = 'block'
+        document.getElementById('logout').style.display = 'block'
+
+        sdk.ping().then(pong => console.log({pong}))
+      }
+
       auth.on('error', error => {
         console.log('error', error)
       })
 
       auth.on('success', async () => {
-        // alert('success: ' + JSON.stringify((await auth.state()).me))
         console.log('success')
-        auth
-          .state()
-          .then(r => {
-            if (r.me) {
-              console.log('success, me', JSON.stringify(r.me))
-            }
-          })
+        auth.state().then(state => {
+          if (state.me) {
+            console.log('success, me', JSON.stringify(state.me))
+          }
+        })
       })
 
       auth.on('retrieved', async () => {
         // Redirect, e.g. mobile. Mobile may return to new tab, this
-        // handles the same logic (re-inits the auth Promise) normally
-        // triggered by e.g. a button.
-        //   > Note: it emulates without opening another auth window ;)
-        console.log('Results are in, mobile flow, emulate auth trigger')
+        // must retrieve the state and process it like normally the authorize method
+        // would do
+        console.log('Results are in, mobile flow, process sign in')
 
-        go()
-
-        // alert('retrieved: ' + JSON.stringify((await auth.state()).me))
-        console.log('retrieved')
-        auth
-          .state()
-          .then(r => {
-            if (r.me) {
-              console.log('retrieved, me', JSON.stringify(r.me))
-            }
-          })
+        auth.state().then(state => {
+          if (state) {
+            console.log('retrieved, me:', JSON.stringify(state.me))
+            signedInHandler(state)
+          }
+        })
       })
 
       /**
@@ -113,26 +125,11 @@
 
       function reset() {
         signinbtn.innerText = 'Sign in'
-        document
-          .getElementById('signedin')
-          .style
-          .display = 'none'
-        document
-          .getElementById('error')
-          .style
-          .display = 'none'
-        document
-          .getElementById('trypayload')
-          .style
-          .display = 'none'
-        document
-          .getElementById('logout')
-          .style
-          .display = 'none'
-        document
-          .getElementById('results')
-          .style
-          .display = 'none'
+        document.getElementById('signedin').style.display = 'none'
+        document.getElementById('error').style.display = 'none'
+        document.getElementById('trypayload').style.display = 'none'
+        document.getElementById('logout').style.display = 'none'
+        document.getElementById('results').style.display = 'none'
       }
 
       // Start in default UI state
@@ -145,55 +142,15 @@
         reset()
         signinbtn.innerText = 'Signing in...'
 
-        return auth
-          .authorize()
-          .then(authorized => {
-            // Assign to global, please don't do this but for the sake of the demo it's easy
-            sdk = authorized
-              .sdk
+        return auth.authorize().then(signedInHandler).catch(e => {
+          console.log('Auth error', e)
 
-              console
-              .log('Authorized',
-              /* authorized.jwt, */
-              authorized.me)
-            signinbtn.style.display = 'none'
+          reset()
 
-            document
-              .getElementById('signedin')
-              .style
-              .display = 'block'
-
-            var resultspre = document.getElementById('results')
-
-            resultspre.style.display = 'block'
-            resultspre.innerText = JSON.stringify(authorized.me, null, 2)
-            document
-              .getElementById('trypayload')
-              .style
-              .display = 'block'
-            document
-              .getElementById('logout')
-              .style
-              .display = 'block'
-
-            sdk
-              .ping()
-              .then(pong => console.log({pong}))
-          })
-          .catch(e => {
-            console.log('Auth error', e)
-
-            reset()
-
-            document
-              .getElementById('error')
-              .style
-              .display = 'block'
-            document
-              .getElementById('error')
-              .innerText = e.message
-          })
-        }
+          document.getElementById('error').style.display = 'block'
+          document.getElementById('error').innerText = e.message
+        })
+      }
 
       function go_logout() {
         auth.logout()
@@ -225,17 +182,13 @@
             }
           })
           .then(function ({created, resolved}) {
-            if (created.pushed) {
-              alert('Now check Xumm, there should be a push notification + sign request in your event list waiting for you ;)')
-            } else {
-              alert('Now check Xumm, there should be a sign request in your event list waiting for you ;) (This would have been pushed, but it seems you did not grant Xumm the push permission)')
-            }
+            alert(created.pushed
+              ? 'Now check Xumm, there should be a push notification + sign request in your event list waiting for you ;)'
+              : 'Now check Xumm, there should be a sign request in your event list waiting for you ;) (This would have been pushed, but it seems you did not grant Xumm the push permission)'
+            )
 
             resolved.then(function (payloadOutcome) {
-              alert('Payload ' + (
-                payloadOutcome.signed
-                ? 'signed (TX Hash: ' + payloadOutcome.txid + ')'
-                : 'rejected') + ', see the browser console for more info')
+              alert('Payload ' + (payloadOutcome.signed ? 'signed (TX Hash: ' + payloadOutcome.txid + ')' : 'rejected') + ', see the browser console for more info')
               console.log(payloadOutcome)
             })
           })
