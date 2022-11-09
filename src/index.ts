@@ -136,6 +136,7 @@ export class XummPkce extends EventEmitter {
               if (pong?.jwtData?.sub) {
                 // Yay, user still signed in, JWT still valid!
                 this.autoResolvedFlow = Object.assign(existingJwt, { sdk });
+                await this.authorize();
                 this.emit("retrieved");
               } else {
                 this.logout();
@@ -282,6 +283,7 @@ export class XummPkce extends EventEmitter {
         if (document.readyState === "complete") {
           log("(readystatechange: [ " + document.readyState + " ])");
           this.handleMobileGrant();
+          await this.authorize();
           this.emit("retrieved");
         }
       });

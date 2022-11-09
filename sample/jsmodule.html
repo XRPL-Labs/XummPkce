@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Xumm Web3 demo</title>
+  </head>
+  <body>
+    <h1>Sample</h1>
+    <h2 id="sub">...</h2>
+    <button id="auth">Auth</button>
+    <button id="logout">Logout</button>
+    <script type="module">
+      import 'https://xumm.app/assets/cdn/xumm-oauth2-pkce.min.js'
+
+      const xumm = new XummPkce('47d328db-0b34-4451-a258-393480c9b4cd')
+
+      document.getElementById('auth').onclick = () => {
+        xumm.authorize().catch(e => console.log('e', e))
+      }
+
+      document.getElementById('logout').onclick = () => {
+        xumm.logout()
+        document.getElementById('sub').innerText = '...'
+      }
+
+      xumm.on("error", (error) => {
+        console.log("error", error)
+      })
+
+      xumm.on("success", async () => {
+        const state = await xumm.state() // state.sdk = instance of https://www.npmjs.com/package/xumm-sdk
+        document.getElementById('sub').innerText = state?.me?.sub
+      })
+
+      xumm.on("retrieved", async () => {
+        console.log("Retrieved: from localStorage or mobile browser redirect")
+        const state = await xumm.state() // state.sdk = instance of https://www.npmjs.com/package/xumm-sdk
+        document.getElementById('sub').innerText = state?.me?.sub
+      })
+    </script>
+  </body>
+</html>
