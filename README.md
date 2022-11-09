@@ -17,9 +17,11 @@ NPM:
 const xumm = new XummPkce("uuid-uuid-uuid-uuid");
 
 const xummSignInHandler = (state) => {
-  const { sdk, me } = state;
-  console.log("state", me);
-  // Also: sdk » xumm-sdk (npm)
+  if (state.me) {
+    const { sdk, me } = state;
+    console.log("state", me);
+    // Also: sdk » xumm-sdk (npm)
+  }
 };
 // To pick up on mobile client redirects:
 xumm.on("retrieved", async () => {
@@ -37,28 +39,7 @@ document.getElementById("somebutton").onclick = () => {
 
 #### Event based sample
 
-```javascript
-const xumm = new XummPkce("uuid-uuid-uuid-uuid");
-
-document.getElementById("somebutton").onclick = xumm.authorize
-
-xumm.on("error", (error) => {
-  console.log("error", error);
-});
-
-xumm.on("success", async () => {
-  const state = await xumm.state();
-  console.log("success:", state.me);
-  // Also: state.sdk » xumm-sdk (npm)
-});
-
-xumm.on("retrieved", async () => {
-  console.log("Retrieved: from localStorage or mobile browser redirect");
-  const state = await xumm.state();
-  console.log("retrieved:", state.me);
-  // Also: state.sdk » xumm-sdk (npm)
-});
-```
+See [https://github.com/XRPL-Labs/XummPkce/blob/main/sample/jsmodule.html](this example) :)
 
 ### CDN (browser):
 
