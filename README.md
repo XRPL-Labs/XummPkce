@@ -40,6 +40,8 @@ document.getElementById("somebutton").onclick = () => {
 ```javascript
 const xumm = new XummPkce("uuid-uuid-uuid-uuid");
 
+document.getElementById("somebutton").onclick = xumm.authorize
+
 xumm.on("error", (error) => {
   console.log("error", error);
 });
