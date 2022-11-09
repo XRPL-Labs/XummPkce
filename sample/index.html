@@ -15,7 +15,7 @@
       NPM (JS/TS): https://www.npmjs.com/package/xumm-oauth2-pkce
       CDN:         <script src="https://xumm.app/assets/cdn/xumm-oauth2-pkce.min.js"></script>
     -->
-    <script src="https://xumm.app/assets/cdn/xumm-oauth2-pkce.min.js"></script>
+    <script src="https://xumm.app/assets/cdn/xumm-oauth2-pkce.min.js?1337"></script>
   </head>
   <body>
     <div class="container mt-2">
@@ -111,6 +111,7 @@
         console.log('Results are in, mobile flow, process sign in')
 
         auth.state().then(state => {
+          console.log(state)
           if (state) {
             console.log('retrieved, me:', JSON.stringify(state.me))
             signedInHandler(state)
