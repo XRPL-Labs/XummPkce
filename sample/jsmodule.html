@@ -7,7 +7,7 @@
   </head>
   <body>
     <h1>Sample</h1>
-    <h2 id="sub">...</h2>
+    <h2 id="sub">... (please sign in)</h2>
     <button id="auth">Auth</button>
     <button id="logout">Logout</button>
     <script type="module">
@@ -21,7 +21,7 @@
 
       document.getElementById('logout').onclick = () => {
         xumm.logout()
-        document.getElementById('sub').innerText = '...'
+        document.getElementById('sub').innerText = '... (please sign in)'
       }
 
       xumm.on("error", (error) => {
