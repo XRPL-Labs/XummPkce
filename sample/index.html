@@ -14,19 +14,26 @@
     <!--
       NPM (JS/TS): https://www.npmjs.com/package/xumm-oauth2-pkce
     -->
-    <script src="https://xumm.app/assets/cdn/xumm-oauth2-pkce.min.js"></script>
+    <script src="https://xumm.app/assets/cdn/xumm-oauth2-pkce.min.js?2"></script>
   </head>
   <body>
     <div class="container mt-2">
       <h2>Hello, world!</h2>
       <p class="alert alert-primary mb-2">
-        <span class="h5 d-inline-block mb-2">This is <q><b>Web3</b> wallet <b>identity</b> &amp; <b>transaction initiation</b></q> for the XRP Ledger ecosystem.</span>
-        <br />
+        <span class="h5 d-inline-block mb-2">This is <q>
+            <b>Web3</b> wallet <b>identity</b> &amp; <b>transaction initiation</b>
+          </q> for the XRP Ledger ecosystem.</span>
+        <br/>
         Tech under the hood: OAuth2 Implicit PKCE flow for the Xumm platform and XRP Ledger ecosystem.
-        <b>Using nothing but simple client side Javascript: <a href="https://github.com/XRPL-Labs/XummPkce/blob/main/sample/index.html" target="_blank">source</a></b>.
+        <b>Using nothing but simple client side Javascript: <a href="https://github.com/XRPL-Labs/XummPkce/blob/main/sample/index.html" target="_blank">source</a>
+        </b>.
       </p>
       <div class="text-end py-0 my-0">
-        <div class="float-start pt-0"><code class="text-dark bg-white">SDK:</code> <a class="me-3" target="_blank" href="https://badge.fury.io/js/xumm-oauth2-pkce"><span aria-label="npm version" class="img" role="button" tabindex="0"><img src="https://badge.fury.io/js/xumm-oauth2-pkce.svg" alt="npm version" align="" caption="" height="auto" title="" width="auto" loading="lazy"></span></a></div>
+        <div class="float-start pt-0">
+          <code class="text-dark bg-white">SDK:</code>
+          <a class="me-3" target="_blank" href="https://badge.fury.io/js/xumm-oauth2-pkce">
+            <span aria-label="npm version" class="img" role="button" tabindex="0"><img src="https://badge.fury.io/js/xumm-oauth2-pkce.svg" alt="npm version" align="" caption="" height="auto" title="" width="auto" loading="lazy"></span></a>
+        </div>
         <a href="https://github.com/XRPL-Labs/XummPkce/blob/main/sample/index.html" target="_blank" class="mt-2 py-1 btn btn-primary">Source (this page)</a>
         <a href="https://xumm.readme.io" target="_blank" class="mt-2 ms-2 py-1 btn btn-outline-primary">Xumm Developer Docs</a>
       </div>
@@ -45,7 +52,9 @@
       </div>
 
       <div class="mt-5 pt-2 pb-2 border-top border-1 border-muted text-end">
-        <small><a href="https://github.com/XRPL-Labs/XummPkce/blob/main/sample/index.html" target="_blank">Source on Github</a></small>
+        <small>
+          <a href="https://github.com/XRPL-Labs/XummPkce/blob/main/sample/index.html" target="_blank">Source on Github</a>
+        </small>
       </div>
     </div>
 
@@ -56,13 +65,26 @@
       var auth = new XummPkce('47d328db-0b34-4451-a258-393480c9b4cd')
       var sdk = null
 
-      auth.on('retrieved', event => {
+      auth.on('error', error => {
+        alert(
+          'error: ' + error
+          ?.message)
+      })
+
+      auth.on('success', async () => {
+        alert('success: ' + JSON.stringify((await auth.state()).me))
+      })
+
+      auth.on('retrieved', async () => {
         // Redirect, e.g. mobile. Mobile may return to new tab, this
         // handles the same logic (re-inits the auth Promise) normally
         // triggered by e.g. a button.
         //   > Note: it emulates without opening another auth window ;)
         console.log('Results are in, mobile flow, emulate auth trigger')
+
         go()
+
+        alert('retrieved: ' + JSON.stringify((await auth.state()).me))
       })
 
       /**
@@ -72,11 +94,26 @@
 
       function reset() {
         signinbtn.innerText = 'Sign in'
-        document.getElementById('signedin').style.display = 'none'
-        document.getElementById('error').style.display = 'none'
-        document.getElementById('trypayload').style.display = 'none'
-        document.getElementById('logout').style.display = 'none'
-        document.getElementById('results').style.display = 'none'
+        document
+          .getElementById('signedin')
+          .style
+          .display = 'none'
+        document
+          .getElementById('error')
+          .style
+          .display = 'none'
+        document
+          .getElementById('trypayload')
+          .style
+          .display = 'none'
+        document
+          .getElementById('logout')
+          .style
+          .display = 'none'
+        document
+          .getElementById('results')
+          .style
+          .display = 'none'
       }
 
       // Start in default UI state
@@ -93,31 +130,51 @@
           .authorize()
           .then(authorized => {
             // Assign to global, please don't do this but for the sake of the demo it's easy
-            sdk = authorized.sdk
+            sdk = authorized
+              .sdk
 
-            console.log('Authorized', /* authorized.jwt, */ authorized.me)
+              console
+              .log('Authorized',
+              /* authorized.jwt, */
+              authorized.me)
             signinbtn.style.display = 'none'
 
-            document.getElementById('signedin').style.display = 'block'
+            document
+              .getElementById('signedin')
+              .style
+              .display = 'block'
 
             var resultspre = document.getElementById('results')
 
             resultspre.style.display = 'block'
             resultspre.innerText = JSON.stringify(authorized.me, null, 2)
-            document.getElementById('trypayload').style.display = 'block'
-            document.getElementById('logout').style.display = 'block'
+            document
+              .getElementById('trypayload')
+              .style
+              .display = 'block'
+            document
+              .getElementById('logout')
+              .style
+              .display = 'block'
 
-            sdk.ping().then(pong => console.log({pong}))
+            sdk
+              .ping()
+              .then(pong => console.log({pong}))
           })
           .catch(e => {
             console.log('Auth error', e)
 
             reset()
 
-            document.getElementById('error').style.display = 'block'
-            document.getElementById('error').innerText = e.message
+            document
+              .getElementById('error')
+              .style
+              .display = 'block'
+            document
+              .getElementById('error')
+              .innerText = e.message
           })
-      }
+        }
 
       function go_logout() {
         auth.logout()
@@ -127,7 +184,7 @@
 
       function go_payload() {
         /**
-          * xumm-oauth2-pkce package returns `sdk` property, 
+          * xumm-oauth2-pkce package returns `sdk` property,
           * allowing access to the Xumm SDK (`xumm-sdk`) package.
           * Xumm SDK methods, docs:
           *      https://www.npmjs.com/package/xumm-sdk
@@ -140,26 +197,33 @@
           }
         }
 
-        sdk.payload.createAndSubscribe(payload, function (payloadEvent) {
-          if (typeof payloadEvent.data.signed !== 'undefined') {
-            // What we return here will be the resolved value of the `resolved` property
-            return payloadEvent.data
-          }
-        }).then(function ({created, resolved}) {
-          if (created.pushed) {
-            alert('Now check Xumm, there should be a push notification + sign request in your event list waiting for you ;)')
-          } else {
-            alert('Now check Xumm, there should be a sign request in your event list waiting for you ;) (This would have been pushed, but it seems you did not grant Xumm the push permission)')
-          }
-
-          resolved.then(function (payloadOutcome) {
-            alert('Payload ' + (payloadOutcome.signed ? 'signed (TX Hash: ' + payloadOutcome.txid + ')' : 'rejected') + ', see the browser console for more info')
-            console.log(payloadOutcome)
+        sdk
+          .payload
+          .createAndSubscribe(payload, function (payloadEvent) {
+            if (typeof payloadEvent.data.signed !== 'undefined') {
+              // What we return here will be the resolved value of the `resolved` property
+              return payloadEvent.data
+            }
           })
-        }).catch(function (payloadError) {
-          alert('Paylaod error', e.message)
-        })
-      }
+          .then(function ({created, resolved}) {
+            if (created.pushed) {
+              alert('Now check Xumm, there should be a push notification + sign request in your event list waiting for you ;)')
+            } else {
+              alert('Now check Xumm, there should be a sign request in your event list waiting for you ;) (This would have been pushed, but it seems you did not grant Xumm the push permission)')
+            }
+
+            resolved.then(function (payloadOutcome) {
+              alert('Payload ' + (
+                payloadOutcome.signed
+                ? 'signed (TX Hash: ' + payloadOutcome.txid + ')'
+                : 'rejected') + ', see the browser console for more info')
+              console.log(payloadOutcome)
+            })
+          })
+          .catch(function (payloadError) {
+            alert('Paylaod error', e.message)
+          })
+        }
     </script>
   </body>
 </html>

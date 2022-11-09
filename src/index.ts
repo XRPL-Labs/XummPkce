@@ -20,6 +20,7 @@ interface XummPkceOptions {
   rememberJwt: boolean;
   storage: Storage;
 }
+
 interface ResolvedFlow {
   sdk: XummSdkJwt;
   jwt: string;
@@ -37,9 +38,9 @@ interface ResolvedFlow {
 }
 
 export interface XummPkceEvent {
-  // `retrieved` returns nothing, just a trigger, the authorize()
-  // method should be called later to handle based on Promise()
   retrieved: () => void;
+  error: (error: Error) => void;
+  success: () => void;
 }
 
 export declare interface XummPkce {
@@ -126,7 +127,7 @@ export class XummPkce extends EventEmitter {
 
         if (existingJwt?.jwt && typeof existingJwt.jwt === "string") {
           const sdk = new XummSdkJwt(existingJwt.jwt);
-          sdk.ping().then((pong) => {
+          sdk.ping().then(async (pong) => {
             /**
              * Pretend mobile so no window.open is triggered
              */
@@ -271,7 +272,7 @@ export class XummPkce extends EventEmitter {
       this.mobileRedirectFlow = true;
       this.urlParams = params;
 
-      document.addEventListener("readystatechange", (event) => {
+      document.addEventListener("readystatechange", async (event) => {
         if (document.readyState === "complete") {
           log("(readystatechange: [ " + document.readyState + " ])");
           this.handleMobileGrant();
@@ -287,9 +288,9 @@ export class XummPkce extends EventEmitter {
   }
 
   private handleMobileGrant() {
-    // log(document?.location?.search);
     if (this.urlParams && this.mobileRedirectFlow) {
       log("Send message event");
+
       const messageEventData = {
         data: JSON.stringify(
           this.urlParams.get("authorization_code")
@@ -311,9 +312,9 @@ export class XummPkce extends EventEmitter {
         origin: "https://oauth2.xumm.app",
       };
 
-      // log(messageEventData);
       const event = new MessageEvent("message", messageEventData);
       window.dispatchEvent(event);
+
       return true;
     }
     return false;
@@ -336,22 +337,51 @@ export class XummPkce extends EventEmitter {
 
     this.resolved = false;
 
+    const clearUrlParams = () => {
+      if (this.urlParams && this.mobileRedirectFlow) {
+        const newUrlParams = new URLSearchParams(
+          document?.location?.search || ""
+        );
+        newUrlParams.delete("authorization_code");
+        newUrlParams.delete("code");
+        newUrlParams.delete("state");
+        const newSearchParamsString = newUrlParams.toString();
+
+        history.replaceState(
+          {},
+          "",
+          document.location.href.split("?")[0] +
+            (newSearchParamsString !== "" ? "?" : "") +
+            newSearchParamsString
+        );
+      }
+    };
+
+    clearUrlParams();
+
     if (this.autoResolvedFlow) {
-      this.resolved = true;
-      this.promise = Promise.resolve(this.autoResolvedFlow);
-      this.rejectPromise = this.resolvePromise = () => {};
-      log("Auto resolved");
+      if (!this.resolved) {
+        this.resolved = true;
+        this.promise = Promise.resolve(this.autoResolvedFlow);
+        this.rejectPromise = this.resolvePromise = () => {};
+        log("Auto resolved");
+        this.emit("success");
+      }
     } else {
       this.promise = new Promise((resolve, reject) => {
         this.resolvePromise = (_) => {
+          const resolved = resolve(_);
           this.resolved = true;
           log("Xumm Sign in RESOLVED");
-          return resolve(_);
+          this.emit("success");
+          return resolved;
         };
         this.rejectPromise = (_) => {
+          const rejected = reject(_);
           this.resolved = true;
+          this.emit("error", typeof _ === "string" ? new Error(_) : _);
           log("Xumm Sign in REJECTED");
-          return reject(_);
+          return rejected;
         };
       });
     }
@@ -359,8 +389,13 @@ export class XummPkce extends EventEmitter {
     return this.promise;
   }
 
+  public async state() {
+    return this.promise;
+  }
+
   public logout() {
     try {
+      this.resolved = false;
       this.autoResolvedFlow = undefined;
       this.options.storage?.removeItem("XummPkceJwt");
     } catch (e) {
