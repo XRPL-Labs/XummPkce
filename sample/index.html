@@ -66,13 +66,19 @@
       var sdk = null
 
       auth.on('error', error => {
-        alert(
-          'error: ' + error
-          ?.message)
+        console.log('error', error)
       })
 
       auth.on('success', async () => {
-        alert('success: ' + JSON.stringify((await auth.state()).me))
+        // alert('success: ' + JSON.stringify((await auth.state()).me))
+        console.log('success')
+        auth
+          .state()
+          .then(r => {
+            if (r.me) {
+              console.log('success, me', JSON.stringify(r.me))
+            }
+          })
       })
 
       auth.on('retrieved', async () => {
@@ -84,7 +90,15 @@
 
         go()
 
-        alert('retrieved: ' + JSON.stringify((await auth.state()).me))
+        // alert('retrieved: ' + JSON.stringify((await auth.state()).me))
+        console.log('retrieved')
+        auth
+          .state()
+          .then(r => {
+            if (r.me) {
+              console.log('retrieved, me', JSON.stringify(r.me))
+            }
+          })
       })
 
       /**
