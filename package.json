@@ -1,6 +1,6 @@
 {
   "name": "xumm-oauth2-pkce",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "description": "Xumm JS SDK for client side only OAuth2 PKCE (implicit flow) auth.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
