@@ -39,7 +39,7 @@ document.getElementById("somebutton").onclick = () => {
 
 #### Event based sample
 
-See [https://github.com/XRPL-Labs/XummPkce/blob/main/sample/jsmodule.html](this example) :)
+See [this example](https://github.com/XRPL-Labs/XummPkce/blob/main/sample/jsmodule.html) :)
 
 ### CDN (browser):
 
