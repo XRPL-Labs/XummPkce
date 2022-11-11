@@ -329,6 +329,7 @@ export class XummPkce extends EventEmitter {
   }
 
   public async authorize() {
+    this.resolved = false;
     if (!this.mobileRedirectFlow && !this.autoResolvedFlow) {
       const url = this.authorizeUrl();
       const popup = window.open(
