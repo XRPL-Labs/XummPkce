@@ -41,6 +41,13 @@ document.getElementById("somebutton").onclick = () => {
 };
 ```
 
+#### Events (emitted)
+
+- `success` = User signed in successfully, `sdk.state()` returns `.me` and `.sdk` objects
+- `retrieved` = Retrieved existing session after e.g. browser refresh or mobile redirect, `sdk.state()` returns `.me` and `.sdk` objects
+- `error` = Error, expected (e.g. user cancelled) or unexpected (...), returns argument `error` with an `Error()` object, `sdk.state()` returns null
+
+
 ### CDN (browser):
 
 A browserified version (latest) is available at [JSDelivr](https://cdn.jsdelivr.net/npm/xumm-oauth2-pkce/dist/browser.min.js) & direclty from the `xumm.app` domain:
