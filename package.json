@@ -27,7 +27,7 @@
   "dependencies": {
     "debug": "^4.1.1",
     "js-pkce": "^1.2.1",
-    "xumm-sdk": "^1.3.7"
+    "xumm-sdk": "^1.5.0"
   },
   "devDependencies": {
     "@types/debug": "^4.1.5",
