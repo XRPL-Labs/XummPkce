@@ -417,3 +417,56 @@ export class XummPkce extends EventEmitter {
     return this?.popup;
   }
 }
+
+const thread = (_XummPkce?: XummPkceThread): XummPkceThread => {
+  let attached = false;
+  if (_XummPkce) {
+    if (typeof window === "object") {
+      if (typeof (window as any)._XummPkce === "undefined") {
+        (window as any)._XummPkce = _XummPkce;
+        attached = true;
+      }
+    }
+  }
+
+  const instance = (window as any)?._XummPkce;
+
+  if (instance && attached) {
+    console.log("XummPkce attached to window");
+  }
+
+  return instance;
+};
+
+export class XummPkce {
+  constructor(
+    xummApiKey: string,
+    optionsOrRedirectUrl?: string | XummPkceOptions
+  ) {
+    if (!thread()) {
+      thread(new XummPkceThread(xummApiKey, optionsOrRedirectUrl));
+    }
+  }
+
+  on<U extends keyof XummPkceEvent>(event: U, listener: XummPkceEvent[U]) {
+    thread().on(event, listener);
+    return this;
+  }
+
+  off<U extends keyof XummPkceEvent>(event: U, listener: XummPkceEvent[U]) {
+    thread().off(event, listener);
+    return this;
+  }
+
+  authorize() {
+    return thread().authorize();
+  }
+
+  state() {
+    return thread().state();
+  }
+
+  logout() {
+    return thread().logout();
+  }
+}
