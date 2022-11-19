@@ -43,7 +43,7 @@ export interface XummPkceEvent {
   success: () => void;
 }
 
-export declare interface XummPkce {
+export declare interface XummPkceThread {
   on<U extends keyof XummPkceEvent>(event: U, listener: XummPkceEvent[U]): this;
   off<U extends keyof XummPkceEvent>(
     event: U,
@@ -55,7 +55,7 @@ export declare interface XummPkce {
   // ): boolean;
 }
 
-export class XummPkce extends EventEmitter {
+export class XummPkceThread extends EventEmitter {
   private pkce: PKCE;
   private options: XummPkceOptions;
   private popup: Window | null = null;
