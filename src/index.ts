@@ -63,6 +63,7 @@ export class XummPkceThread extends EventEmitter {
   private jwt?: string;
 
   private resolved = false;
+  private resolvedSuccessfully?: boolean;
   private resolvePromise?: (result: ResolvedFlow) => void;
   private rejectPromise?: (error: Error) => void;
   private promise?: Promise<ResolvedFlow>;
@@ -329,6 +330,10 @@ export class XummPkceThread extends EventEmitter {
   }
 
   public async authorize() {
+    // Do not authorize twice
+    if (this.resolvedSuccessfully) {
+      return this.promise;
+    }
     this.resolved = false;
     if (!this.mobileRedirectFlow && !this.autoResolvedFlow) {
       const url = this.authorizeUrl();
@@ -382,6 +387,7 @@ export class XummPkceThread extends EventEmitter {
           const resolved = resolve(_);
           this.resolved = true;
           log("Xumm Sign in RESOLVED");
+          this.resolvedSuccessfully = true;
           this.emit("success");
           return resolved;
         };
@@ -405,6 +411,7 @@ export class XummPkceThread extends EventEmitter {
   public logout() {
     try {
       this.resolved = false;
+      this.resolvedSuccessfully = undefined;
       this.autoResolvedFlow = undefined;
       this.options.storage?.removeItem("XummPkceJwt");
     } catch (e) {
