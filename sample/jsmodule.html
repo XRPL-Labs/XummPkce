@@ -11,9 +11,12 @@
     <button id="auth">Auth</button>
     <button id="logout">Logout</button>
     <script type="module">
-      import 'https://xumm.app/assets/cdn/xumm-oauth2-pkce.min.js?v=2.4.0'
+      import 'https://xumm.app/assets/cdn/xumm-oauth2-pkce.min.js?v=2.5.0'
 
-      const xumm = new XummPkce('47d328db-0b34-4451-a258-393480c9b4cd')
+      const xumm = new XummPkce('47d328db-0b34-4451-a258-393480c9b4cd', {
+        implicit: true, // Implicit: allows to e.g. move from social browser to stock browser
+        redirectUrl: document.location.href + '?custom_state=test'
+      })
 
       document.getElementById('auth').onclick = () => {
         xumm.authorize().catch(e => console.log('e', e))

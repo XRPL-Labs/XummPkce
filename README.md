@@ -9,11 +9,38 @@ Demo? https://oauth2-pkce-demo.xumm.dev
 NPM:
 [https://www.npmjs.com/package/xumm-oauth2-pkce](https://www.npmjs.com/package/xumm-oauth2-pkce)
 
-## Sample:
+## Constructor
 
-#### Event based sample
+```
+new XummPkce('api-key-uuidv4', { options })
+```
 
-##### See [this example](https://github.com/XRPL-Labs/XummPkce/blob/main/sample/jsmodule.html) :)
+#### Options
+
+```
+interface XummPkceOptions {
+  redirectUrl: string;      // Defaults to `document.location.href`, e.g. to add state params.
+  rememberJwt: boolean;     // Defaults to `true`
+  storage: Storage;         // Defaults to window.localStorage
+  implicit: boolean;        // Defaults to `false`, `true` allows x-browser sign in, but it less secure
+}
+```
+
+## Samples:
+
+#### Event based
+
+Please note: please use the Event based sample (above) if possible: this is more compatible with future
+releases than the promise-based (await/async) method as displayed below.
+
+### See [this example (source code)](https://github.com/XRPL-Labs/XummPkce/blob/main/sample/jsmodule.html) :)
+
+#### Events (emitted)
+
+- `success` = User signed in successfully, `sdk.state()` returns `.me` and `.sdk` objects
+- `retrieved` = Retrieved existing session after e.g. browser refresh or mobile redirect, `sdk.state()` returns `.me` and `.sdk` objects
+- `error` = Error, expected (e.g. user cancelled) or unexpected (...), returns argument `error` with an `Error()` object, `sdk.state()` returns null
+
 
 #### Promise based sample
 
@@ -40,12 +67,6 @@ document.getElementById("somebutton").onclick = () => {
   });
 };
 ```
-
-#### Events (emitted)
-
-- `success` = User signed in successfully, `sdk.state()` returns `.me` and `.sdk` objects
-- `retrieved` = Retrieved existing session after e.g. browser refresh or mobile redirect, `sdk.state()` returns `.me` and `.sdk` objects
-- `error` = Error, expected (e.g. user cancelled) or unexpected (...), returns argument `error` with an `Error()` object, `sdk.state()` returns null
 
 
 ### CDN (browser):

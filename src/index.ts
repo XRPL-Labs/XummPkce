@@ -1,7 +1,7 @@
 // import { debug as Debug } from "debug";
 import { EventEmitter } from "events";
 import { XummSdkJwt } from "xumm-sdk";
-import PKCE from "js-pkce";
+import PKCE from "xumm-js-pkce";
 
 // localStorage.debug = "xummpkce*";
 
@@ -19,6 +19,7 @@ interface XummPkceOptions {
   redirectUrl: string;
   rememberJwt: boolean;
   storage: Storage;
+  implicit: boolean;
 }
 
 interface ResolvedFlow {
@@ -82,6 +83,7 @@ export class XummPkceThread extends EventEmitter {
       redirectUrl: document.location.href,
       rememberJwt: true,
       storage: localStorage,
+      implicit: false,
     };
 
     /**
@@ -97,23 +99,30 @@ export class XummPkceThread extends EventEmitter {
         this.options.redirectUrl = optionsOrRedirectUrl.redirectUrl;
       }
       if (typeof optionsOrRedirectUrl.rememberJwt === "boolean") {
+        this.options.rememberJwt = optionsOrRedirectUrl.rememberJwt;
       }
       if (typeof optionsOrRedirectUrl.storage === "object") {
         this.options.storage = optionsOrRedirectUrl.storage;
+      }
+      if (typeof optionsOrRedirectUrl.implicit === "boolean") {
+        this.options.implicit = optionsOrRedirectUrl.implicit;
       }
     }
 
     /**
      * Construct
      */
-    this.pkce = new PKCE({
+    const pkceOptions = {
       client_id: xummApiKey,
       redirect_uri: this.options.redirectUrl,
       authorization_endpoint: "https://oauth2.xumm.app/auth",
       token_endpoint: "https://oauth2.xumm.app/token",
       requested_scopes: "XummPkce",
       storage: this.options.storage,
-    });
+      implicit: this.options.implicit,
+    };
+    // console.log(JSON.stringify(pkceOptions, null, 2));
+    this.pkce = new PKCE(pkceOptions);
 
     /**
      * Check if there is already a valid JWT to be used
@@ -281,7 +290,11 @@ export class XummPkceThread extends EventEmitter {
     );
 
     const params = new URLSearchParams(document?.location?.search || "");
-    if (params.get("authorization_code") || params.get("error_description")) {
+    if (
+      params.get("authorization_code") ||
+      params.get("access_token") ||
+      params.get("error_description")
+    ) {
       this.mobileRedirectFlow = true;
       this.urlParams = params;
 
@@ -307,7 +320,8 @@ export class XummPkceThread extends EventEmitter {
 
       const messageEventData = {
         data: JSON.stringify(
-          this.urlParams.get("authorization_code")
+          this.urlParams.get("authorization_code") ||
+            this.urlParams.get("access_token")
             ? {
                 source: "xumm_sign_request_resolved",
                 options: {
@@ -357,23 +371,27 @@ export class XummPkceThread extends EventEmitter {
     this.resolved = false;
 
     const clearUrlParams = () => {
-      if (this.urlParams && this.mobileRedirectFlow) {
-        const newUrlParams = new URLSearchParams(
-          document?.location?.search || ""
-        );
-        newUrlParams.delete("authorization_code");
-        newUrlParams.delete("code");
-        newUrlParams.delete("state");
-        const newSearchParamsString = newUrlParams.toString();
+      const newUrlParams = new URLSearchParams(
+        document?.location?.search || ""
+      );
+      // PKCE
+      newUrlParams.delete("authorization_code");
+      newUrlParams.delete("code");
+      newUrlParams.delete("scope");
+      newUrlParams.delete("state");
+      // Implicit
+      newUrlParams.delete("access_token");
+      newUrlParams.delete("refresh_token");
+      newUrlParams.delete("token_type");
+      newUrlParams.delete("expires_in");
+      const newSearchParamsString = newUrlParams.toString();
 
-        history.replaceState(
-          {},
-          "",
-          document.location.href.split("?")[0] +
-            (newSearchParamsString !== "" ? "?" : "") +
-            newSearchParamsString
-        );
-      }
+      const url =
+        document.location.href.split("?")[0] +
+        (newSearchParamsString !== "" ? "?" : "") +
+        newSearchParamsString;
+
+      (window as any).history.replaceState({ path: url }, "", url);
     };
 
     clearUrlParams();
@@ -419,6 +437,7 @@ export class XummPkceThread extends EventEmitter {
       this.resolvedSuccessfully = undefined;
       this.autoResolvedFlow = undefined;
       this.options.storage?.removeItem("XummPkceJwt");
+      this.mobileRedirectFlow = false;
     } catch (e) {
       // Nothing to do
     }
