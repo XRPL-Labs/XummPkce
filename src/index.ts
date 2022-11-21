@@ -93,14 +93,13 @@ export class XummPkceThread extends EventEmitter {
       typeof optionsOrRedirectUrl === "object" &&
       optionsOrRedirectUrl
     ) {
-      if (typeof this.options.redirectUrl === "string") {
-        this.options.redirectUrl = this.options.redirectUrl;
+      if (typeof optionsOrRedirectUrl.redirectUrl === "string") {
+        this.options.redirectUrl = optionsOrRedirectUrl.redirectUrl;
       }
-      if (typeof this.options.rememberJwt === "boolean") {
-        this.options.rememberJwt = this.options.rememberJwt;
+      if (typeof optionsOrRedirectUrl.rememberJwt === "boolean") {
       }
-      if (typeof this.options.storage === "object") {
-        this.options.storage = this.options.storage;
+      if (typeof optionsOrRedirectUrl.storage === "object") {
+        this.options.storage = optionsOrRedirectUrl.storage;
       }
     }
 
