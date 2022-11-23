@@ -13,7 +13,9 @@ import PKCE from "xumm-js-pkce";
 //   alert(args.map((a) => JSON.stringify(a, null, 2)).join(" "));
 // };
 
-console.log("Xumm OAuth2 PKCE Authorization Code Flow lib.");
+if (typeof window !== "undefined") {
+  console.log("Xumm OAuth2 PKCE Authorization Code Flow lib.");
+}
 
 interface XummPkceOptions {
   redirectUrl: string;
