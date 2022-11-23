@@ -280,7 +280,7 @@ export class XummPkceThread extends EventEmitter {
                   postMessage?.source
                 );
               }
-            } catch (e: unknown) {
+            } catch (e) {
               console.log("Error parsing message", (e as Error)?.message || e);
             }
           }
@@ -474,30 +474,53 @@ export class XummPkce {
     xummApiKey: string,
     optionsOrRedirectUrl?: string | XummPkceOptions
   ) {
+    if (typeof window === "undefined" || typeof document === "undefined") {
+      return;
+    }
     if (!thread()) {
       thread(new XummPkceThread(xummApiKey, optionsOrRedirectUrl));
     }
   }
 
   on<U extends keyof XummPkceEvent>(event: U, listener: XummPkceEvent[U]) {
-    thread().on(event, listener);
+    const t = thread();
+    if (!t) {
+      return;
+    }
+    t.on(event, listener);
     return this;
   }
 
   off<U extends keyof XummPkceEvent>(event: U, listener: XummPkceEvent[U]) {
-    thread().off(event, listener);
+    const t = thread();
+    if (!t) {
+      return;
+    }
+    t.off(event, listener);
     return this;
   }
 
   authorize() {
-    return thread().authorize();
+    const t = thread();
+    if (!t) {
+      return;
+    }
+    return t.authorize();
   }
 
   state() {
-    return thread().state();
+    const t = thread();
+    if (!t) {
+      return;
+    }
+    return t.state();
   }
 
   logout() {
-    return thread().logout();
+    const t = thread();
+    if (!t) {
+      return;
+    }
+    return t.logout();
   }
 }
