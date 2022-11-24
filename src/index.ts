@@ -24,21 +24,25 @@ interface XummPkceOptions {
   implicit: boolean;
 }
 
-interface ResolvedFlow {
+export { XummSdkJwt };
+
+export interface Me {
+  sub: string;
+  picture: string;
+  account: string;
+  name?: string;
+  domain?: string;
+  blocked: boolean;
+  source: string;
+  kycApproved: boolean;
+  proSubscription: boolean;
+};
+
+export interface ResolvedFlow {
   sdk: XummSdkJwt;
   jwt: string;
-  me: {
-    sub: string;
-    picture: string;
-    account: string;
-    name?: string;
-    domain?: string;
-    blocked: boolean;
-    source: string;
-    kycApproved: boolean;
-    proSubscription: boolean;
-  };
-}
+  me: Me;
+};
 
 export interface XummPkceEvent {
   retrieved: () => void;
