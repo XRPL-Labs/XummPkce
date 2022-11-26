@@ -77,7 +77,7 @@ export class XummPkceThread extends EventEmitter {
 
   constructor(
     xummApiKey: string,
-    optionsOrRedirectUrl?: string | XummPkceOptions
+    optionsOrRedirectUrl?: string | Partial<XummPkceOptions>
   ) {
     super();
 
