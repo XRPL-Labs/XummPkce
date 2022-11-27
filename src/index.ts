@@ -474,7 +474,7 @@ const thread = (_XummPkce?: XummPkceThread): XummPkceThread => {
 export class XummPkce {
   constructor(
     xummApiKey: string,
-    optionsOrRedirectUrl?: string | XummPkceOptions
+    optionsOrRedirectUrl?: string | Partial<XummPkceOptions>
   ) {
     if (typeof window === "undefined" || typeof document === "undefined") {
       return;
