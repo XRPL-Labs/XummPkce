@@ -24,7 +24,7 @@ interface XummPkceOptions {
   implicit: boolean;
 }
 
-interface ResolvedFlow {
+export interface ResolvedFlow {
   sdk: XummSdkJwt;
   jwt: string;
   me: {
