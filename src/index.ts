@@ -440,6 +440,7 @@ export class XummPkceThread extends EventEmitter {
       this.autoResolvedFlow = undefined;
       this.options.storage?.removeItem("XummPkceJwt");
       this.mobileRedirectFlow = false;
+      this.promise = undefined
     } catch (e) {
       // Nothing to do
     }
