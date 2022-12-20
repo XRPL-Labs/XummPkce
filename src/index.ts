@@ -58,6 +58,20 @@ export declare interface XummPkceThread {
   // ): boolean;
 }
 
+const EventReadyPromise = (event: keyof XummPkceEvent) => {
+  let _resolve = (value?: unknown): void => {};
+  const promise = new Promise((resolve) => {
+    _resolve = resolve;
+  });
+  return {
+    promise,
+    resolve: (value?: unknown) => {
+      console.log("XummPKCE <Resolving eventReadyPromise>", event);
+      return _resolve(value);
+    },
+  };
+};
+
 export class XummPkceThread extends EventEmitter {
   private pkce: PKCE;
   private options: XummPkceOptions;
@@ -74,6 +88,12 @@ export class XummPkceThread extends EventEmitter {
 
   private mobileRedirectFlow: boolean = false;
   private urlParams?: URLSearchParams;
+
+  private eventPromises = {
+    retrieved: EventReadyPromise("retrieved"),
+    error: EventReadyPromise("error"),
+    success: EventReadyPromise("success"),
+  };
 
   constructor(
     xummApiKey: string,
@@ -311,6 +331,35 @@ export class XummPkceThread extends EventEmitter {
     }
   }
 
+  public emit<U extends keyof XummPkceEvent>(event: U, ...args: any[]) {
+    // console.log("emitting event", event, ...args);
+    // console.log("subscribers for event", event, this.listenerCount(event));
+    this.eventPromises[event].promise.then(() => {
+      // Emit when subscribed
+      return super.emit(event, ...args);
+    });
+    return true;
+  }
+
+  public on<U extends keyof XummPkceEvent>(
+    event: U,
+    listener: XummPkceEvent[U]
+  ) {
+    // console.log("event added, on", event);
+    this.eventPromises[event].resolve();
+    return super.on(event, listener);
+  }
+
+  public off<U extends keyof XummPkceEvent>(
+    event: U,
+    listener: XummPkceEvent[U]
+  ) {
+    // console.log("event removed, off", event);
+    // Reset promise
+    this.eventPromises[event] = EventReadyPromise(event);
+    return super.off(event, listener);
+  }
+
   // Todo: document, e.g. custom flow, plugin
   public authorizeUrl() {
     return this.pkce.authorizeUrl();
@@ -318,7 +367,7 @@ export class XummPkceThread extends EventEmitter {
 
   private handleMobileGrant() {
     if (this.urlParams && this.mobileRedirectFlow) {
-      console.log("Send message event");
+      // console.log("Send message event");
 
       const messageEventData = {
         data: JSON.stringify(
@@ -434,6 +483,7 @@ export class XummPkceThread extends EventEmitter {
   }
 
   public logout() {
+    console.log("PKCE Logout");
     try {
       this.resolved = false;
       this.resolvedSuccessfully = undefined;
