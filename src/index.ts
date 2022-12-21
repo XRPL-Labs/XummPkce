@@ -320,8 +320,11 @@ export class XummPkceThread extends EventEmitter {
       this.mobileRedirectFlow = true;
       this.urlParams = params;
 
+      let documentReadyExecuted = false
       const onDocumentReady = async (event?: Event) => {
-        if (document.readyState === "complete") {
+        console.log('onDocumentReady', document.readyState)
+        if (!documentReadyExecuted && document.readyState === "complete") {
+          documentReadyExecuted = true
           console.log("(readystatechange: [ " + document.readyState + " ])");
           this.handleMobileGrant();
           await this.authorize();
@@ -329,9 +332,8 @@ export class XummPkceThread extends EventEmitter {
         }
       };
 
-      if (!onDocumentReady()) {
-        document.addEventListener("readystatechange", onDocumentReady);
-      }
+      onDocumentReady()
+      document.addEventListener("readystatechange", onDocumentReady);
     }
   }
 
