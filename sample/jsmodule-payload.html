@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Xumm Web3 demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  </head>
+  <body>
+    <div class="container">
+      <h1>Xumm Web3 demo</h1>
+      <h3>Simple <code class="fw-bold">jsmodule</code> with <b>sign request</b></h3>
+      <h2 class="mt-3 alert alert-primary text-center shadow mb-5" id="sub">... (please sign in)</h2>
+
+      <button class="btn mb-3 btn-primary" id="auth">Auth</button>
+      <button class="btn mb-3 btn-info" style="display: none;" id="signrequest">Sample Payment (Sign request)</button>
+      <button class="btn mb-3 btn-danger" style="display: none;" id="logout">Logout</button>
+    </div>
+
+    <script type="module">
+      import 'https://xumm.app/assets/cdn/xumm-oauth2-pkce.min.js?v=2.7.1'
+
+      const xumm = new XummPkce('47d328db-0b34-4451-a258-393480c9b4cd', {
+        implicit: true, // Implicit: allows to e.g. move from social browser to stock browser
+        redirectUrl: document.location.href + '?custom_state=test'
+      })
+
+      const signedIn = async () => {
+        const state = await xumm.state()
+        if (state?.me?.sub) {
+          document.getElementById('logout').style.display = 'block'
+          document.getElementById('signrequest').style.display = 'block'
+          document.getElementById('auth').style.display = 'none'
+          document.getElementById('sub').innerText = state.me.sub
+        }
+      }
+
+      document.getElementById('auth').onclick = () => xumm.authorize().catch(e => console.log('e', e))
+
+      document.getElementById('signrequest').onclick = async () => {
+        // state.sdk = instance of https://www.npmjs.com/package/xumm-sdk
+        const {sdk} = await xumm.state()
+
+        // You can also use `sdk.payload.createAndSubscribe` to get live status updates (opened, signed, etc.)
+        // Xumm SDK payload = a regular XRPL transaction, but Account Sequence and Fee can be omitted as Xumm
+        // will enter those. They _can_ be supplied though, in which case Xumm will respect their values.
+        // See docs: https://xumm.readme.io/reference/post-payload
+        const payload = await sdk.payload.create({
+          TransactionType: 'Payment',
+          Destination: 'rwietsevLFg8XSmG3bEZzFein1g8RBqWDZ',
+          Amount: String(1_234_567),
+        })
+
+        if (payload.pushed) {
+          alert('Payload `' + payload.uuid + '` pushed to your phone.')
+        } else {
+          // You can also render `payload.refs.qr_png` in your UI
+          alert('Payload not pushed, opening payload...')
+          window.open(payload.next.always)
+        }
+      }
+
+      document.getElementById('logout').onclick = () => {
+        xumm.logout()
+        document.getElementById('logout').style.display = 'none'
+        document.getElementById('signrequest').style.display = 'none'
+        document.getElementById('auth').style.display = 'block'
+        document.getElementById('sub').innerText = '... (please sign in)'
+      }
+
+      xumm.on("error", error => console.log("error", error))
+      xumm.on("success", () => signedIn())
+      xumm.on("retrieved", () => signedIn())
+    </script>
+  </body>
+</html>
