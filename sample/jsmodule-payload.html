@@ -7,7 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
   </head>
   <body>
-    <div class="container">
+    <div class="container mt-2 pb-4">
       <h1>Xumm Web3 demo</h1>
       <h3>Simple <code class="fw-bold">jsmodule</code> with <b>sign request</b></h3>
       <h2 class="mt-3 h4 alert alert-primary text-center shadow mb-5" id="sub">... (please sign in)</h2>
@@ -15,6 +15,8 @@
       <button class="btn mb-3 btn-primary" id="auth">Auth</button>
       <button class="btn mb-3 btn-info" style="display: none;" id="signrequest">Sample Payment (Sign request)</button>
       <button class="btn mb-3 btn-danger" style="display: none;" id="logout">Logout</button>
+
+      <a href="https://github.com/XRPL-Labs/XummPkce/blob/main/sample/jsmodule-payload.html" class="d-block mt-3 mb-4" target="_blank">Source on Github</a>
     </div>
 
     <script type="module">
