@@ -3,9 +3,16 @@ import { EventEmitter } from "events";
 import { XummSdkJwt } from "xumm-sdk";
 import PKCE from "xumm-js-pkce";
 
-// localStorage.debug = "xummpkce*";
+const log = function (...args: any[]) {
+  if (typeof localStorage !== 'undefined') {
+    if (localStorage?.debug) {
+      console.log(...args)
+    }
+  }
+}
 
-// Debug.log = console.log.bind(console);
+// localStorage.debug = "xummpkce*";
+// Debug.log = log.bind(console);
 // const log = Debug("xummpkce");
 
 // If everything else fails:
@@ -14,7 +21,7 @@ import PKCE from "xumm-js-pkce";
 // };
 
 if (typeof window !== "undefined") {
-  console.log("Xumm OAuth2 PKCE Authorization Code Flow lib.");
+  log("Xumm OAuth2 PKCE Authorization Code Flow lib.");
 }
 
 interface XummPkceOptions {
@@ -67,7 +74,7 @@ const EventReadyPromise = (event: keyof XummPkceEvent) => {
   return {
     promise,
     resolve: (value?: unknown) => {
-      // console.log("XummPKCE <Resolving eventReadyPromise>", event);
+      // log("XummPKCE <Resolving eventReadyPromise>", event);
       return _resolve(value);
     },
   };
@@ -145,14 +152,14 @@ export class XummPkceThread extends EventEmitter {
       storage: this.options.storage,
       implicit: this.options.implicit,
     };
-    // console.log(JSON.stringify(pkceOptions, null, 2));
+    // log(JSON.stringify(pkceOptions, null, 2));
     this.pkce = new PKCE(pkceOptions);
 
     /**
      * Check if there is already a valid JWT to be used
      */
     if (this.options.rememberJwt) {
-      console.log("Remember JWT");
+      log("Remember JWT");
       try {
         const existingJwt = JSON.parse(
           this.options.storage?.getItem("XummPkceJwt") || "{}"
@@ -190,17 +197,17 @@ export class XummPkceThread extends EventEmitter {
     window.addEventListener(
       "message",
       (event) => {
-        console.log("Received Event from ", event.origin);
+        log("Received Event from ", event.origin);
         if (
           String(event?.data || "").slice(0, 1) === "{" &&
           String(event?.data || "").slice(-1) === "}"
         ) {
-          console.log("Got PostMessage with JSON");
+          log("Got PostMessage with JSON");
           if (
             event.origin === "https://xumm.app" ||
             event.origin === "https://oauth2.xumm.app"
           ) {
-            console.log(
+            log(
               "Got PostMessage from https://xumm.app / https://oauth2.xumm.app"
             );
             try {
@@ -209,13 +216,13 @@ export class XummPkceThread extends EventEmitter {
                 postMessage?.source === "xumm_sign_request" &&
                 postMessage?.payload
               ) {
-                console.log("Payload opened:", postMessage.payload);
+                log("Payload opened:", postMessage.payload);
               } else if (
                 postMessage?.source === "xumm_sign_request_resolved" &&
                 postMessage?.options
               ) {
-                // console.log("Payload resolved:", postMessage.options);
-                console.log(
+                // log("Payload resolved:", postMessage.options);
+                log(
                   "Payload resolved, mostmessage containing options containing redirect URL: ",
                   postMessage
                 );
@@ -250,14 +257,14 @@ export class XummPkceThread extends EventEmitter {
                       .then((me) => {
                         if (this.resolvePromise) {
                           if (this.options.rememberJwt) {
-                            console.log("Remembering JWT");
+                            log("Remembering JWT");
                             try {
                               this.options.storage?.setItem(
                                 "XummPkceJwt",
                                 JSON.stringify({ jwt: resp.access_token, me })
                               );
                             } catch (e) {
-                              console.log(
+                              log(
                                 "Could not persist JWT to local storage",
                                 e
                               );
@@ -278,10 +285,10 @@ export class XummPkceThread extends EventEmitter {
                     if (this.rejectPromise) {
                       this.rejectPromise(e?.error ? new Error(e.error) : e);
                     }
-                    console.log(e?.error || e);
+                    log(e?.error || e);
                   });
               } else if (postMessage?.source === "xumm_sign_request_rejected") {
-                console.log("Payload rejected", postMessage?.options);
+                log("Payload rejected", postMessage?.options);
                 if (this.rejectPromise) {
                   this.rejectPromise(
                     new Error(
@@ -293,7 +300,7 @@ export class XummPkceThread extends EventEmitter {
               } else if (
                 postMessage?.source === "xumm_sign_request_popup_closed"
               ) {
-                console.log("Popup closed, wait 750ms");
+                log("Popup closed, wait 750ms");
                 // Wait, maybe the real reason comes in later (e.g. explicitly rejected)
                 setTimeout(() => {
                   if (!this.resolved && this.rejectPromise) {
@@ -301,13 +308,13 @@ export class XummPkceThread extends EventEmitter {
                   }
                 }, 750);
               } else {
-                console.log(
+                log(
                   "Unexpected message, skipping",
                   postMessage?.source
                 );
               }
             } catch (e) {
-              console.log("Error parsing message", (e as Error)?.message || e);
+              log("Error parsing message", (e as Error)?.message || e);
             }
           }
         }
@@ -326,10 +333,10 @@ export class XummPkceThread extends EventEmitter {
 
       let documentReadyExecuted = false;
       const onDocumentReady = async (event?: Event) => {
-        console.log("onDocumentReady", document.readyState);
+        log("onDocumentReady", document.readyState);
         if (!documentReadyExecuted && document.readyState === "complete") {
           documentReadyExecuted = true;
-          console.log("(readystatechange: [ " + document.readyState + " ])");
+          log("(readystatechange: [ " + document.readyState + " ])");
           this.handleMobileGrant();
           await this.authorize();
           this.emit("retrieved");
@@ -342,8 +349,8 @@ export class XummPkceThread extends EventEmitter {
   }
 
   public emit<U extends keyof XummPkceEvent>(event: U, ...args: any[]) {
-    // console.log("emitting event", event, ...args);
-    // console.log("subscribers for event", event, this.listenerCount(event));
+    // log("emitting event", event, ...args);
+    // log("subscribers for event", event, this.listenerCount(event));
     this.eventPromises[event].promise.then(() => {
       // Emit when subscribed
       return super.emit(event, ...args);
@@ -355,7 +362,7 @@ export class XummPkceThread extends EventEmitter {
     event: U,
     listener: XummPkceEvent[U]
   ) {
-    // console.log("event added, on", event);
+    // log("event added, on", event);
     this.eventPromises[event].resolve();
     return super.on(event, listener);
   }
@@ -364,7 +371,7 @@ export class XummPkceThread extends EventEmitter {
     event: U,
     listener: XummPkceEvent[U]
   ) {
-    // console.log("event removed, off", event);
+    // log("event removed, off", event);
     // Reset promise
     this.eventPromises[event] = EventReadyPromise(event);
     return super.off(event, listener);
@@ -377,7 +384,7 @@ export class XummPkceThread extends EventEmitter {
 
   private handleMobileGrant() {
     if (this.urlParams && this.mobileRedirectFlow) {
-      // console.log("Send message event");
+      // log("Send message event");
 
       const messageEventData = {
         data: JSON.stringify(
@@ -426,7 +433,7 @@ export class XummPkceThread extends EventEmitter {
 
       this.popup = popup;
 
-      console.log("Popup opened...", url);
+      log("Popup opened...", url);
     }
 
     this.resolved = false;
@@ -462,7 +469,7 @@ export class XummPkceThread extends EventEmitter {
         this.resolved = true;
         this.promise = Promise.resolve(this.autoResolvedFlow);
         this.rejectPromise = this.resolvePromise = () => {};
-        console.log("Auto resolved");
+        log("Auto resolved");
         this.emit("success");
       }
     } else {
@@ -471,7 +478,7 @@ export class XummPkceThread extends EventEmitter {
           const resolved = resolve(_);
           this.resolved = true;
           this.resolvedSuccessfully = true;
-          console.log("Xumm Sign in RESOLVED");
+          log("Xumm Sign in RESOLVED");
           this.emit("success");
           return resolved;
         };
@@ -479,7 +486,7 @@ export class XummPkceThread extends EventEmitter {
           const rejected = reject(_);
           this.resolved = true;
           this.emit("error", typeof _ === "string" ? new Error(_) : _);
-          console.log("Xumm Sign in REJECTED");
+          log("Xumm Sign in REJECTED");
           return rejected;
         };
       });
@@ -526,7 +533,7 @@ const thread = (_XummPkce?: XummPkceThread): XummPkceThread => {
   const instance = (window as any)?._XummPkce;
 
   if (instance && attached) {
-    console.log("XummPkce attached to window");
+    log("XummPkce attached to window");
   }
 
   return instance;
