@@ -44,6 +44,7 @@ export interface XummPkceEvent {
   retrieved: () => void;
   error: (error: Error) => void;
   success: () => void;
+  loggedout: () => void;
 }
 
 export declare interface XummPkceThread {
@@ -66,7 +67,7 @@ const EventReadyPromise = (event: keyof XummPkceEvent) => {
   return {
     promise,
     resolve: (value?: unknown) => {
-      console.log("XummPKCE <Resolving eventReadyPromise>", event);
+      // console.log("XummPKCE <Resolving eventReadyPromise>", event);
       return _resolve(value);
     },
   };
@@ -93,6 +94,7 @@ export class XummPkceThread extends EventEmitter {
     retrieved: EventReadyPromise("retrieved"),
     error: EventReadyPromise("error"),
     success: EventReadyPromise("success"),
+    loggedout: EventReadyPromise("loggedout"),
   };
 
   constructor(
@@ -177,6 +179,8 @@ export class XummPkceThread extends EventEmitter {
               // That didn't work
               this.logout();
             });
+        } else {
+          this.logout();
         }
       } catch (e) {
         // Do nothing
@@ -320,11 +324,11 @@ export class XummPkceThread extends EventEmitter {
       this.mobileRedirectFlow = true;
       this.urlParams = params;
 
-      let documentReadyExecuted = false
+      let documentReadyExecuted = false;
       const onDocumentReady = async (event?: Event) => {
-        console.log('onDocumentReady', document.readyState)
+        console.log("onDocumentReady", document.readyState);
         if (!documentReadyExecuted && document.readyState === "complete") {
-          documentReadyExecuted = true
+          documentReadyExecuted = true;
           console.log("(readystatechange: [ " + document.readyState + " ])");
           this.handleMobileGrant();
           await this.authorize();
@@ -332,7 +336,7 @@ export class XummPkceThread extends EventEmitter {
         }
       };
 
-      onDocumentReady()
+      onDocumentReady();
       document.addEventListener("readystatechange", onDocumentReady);
     }
   }
@@ -489,7 +493,8 @@ export class XummPkceThread extends EventEmitter {
   }
 
   public logout() {
-    console.log("PKCE Logout");
+    // console.log("PKCE Logout");
+    this.emit("loggedout");
     try {
       this.resolved = false;
       this.resolvedSuccessfully = undefined;
