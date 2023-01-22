@@ -500,8 +500,8 @@ export class XummPkceThread extends EventEmitter {
   }
 
   public logout() {
-    // console.log("PKCE Logout");
-    this.emit("loggedout");
+    // log("PKCE Logout");
+    setTimeout(() => this.emit("loggedout"), 0);
     try {
       this.resolved = false;
       this.resolvedSuccessfully = undefined;
