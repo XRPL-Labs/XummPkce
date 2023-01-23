@@ -1,5 +1,7 @@
 # Xumm OAuth2 Authorization Code PKCE flow
 
+#### Part of the "Xumm Universal SDK", which is the preferred way of interacting with the Xumm ecosystem from JS/TS environments: https://www.npmjs.com/package/xumm - https://github.com/XRPL-Labs/Xumm-Universal-SDK
+
 Xumm JS SDK for client side only OAuth2 PKCE (Authorization Code flow) auth [![npm version](https://badge.fury.io/js/xumm-oauth2-pkce.svg)](https://badge.fury.io/js/xumm-oauth2-pkce)
 
 Questions? https://xumm.readme.io/discuss
