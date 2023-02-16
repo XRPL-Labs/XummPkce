@@ -4,12 +4,12 @@ import { XummSdkJwt } from "xumm-sdk";
 import PKCE from "xumm-js-pkce";
 
 const log = function (...args: any[]) {
-  if (typeof localStorage !== 'undefined') {
+  if (typeof localStorage !== "undefined") {
     if (localStorage?.debug) {
-      console.log(...args)
+      console.log(...args);
     }
   }
-}
+};
 
 // localStorage.debug = "xummpkce*";
 // Debug.log = log.bind(console);
@@ -31,6 +31,13 @@ interface XummPkceOptions {
   implicit: boolean;
 }
 
+export interface XummProfile {
+  slug: string;
+  profileUrl: string;
+  accountSlug: string | null;
+  payString: string | null;
+}
+
 export interface ResolvedFlow {
   sdk: XummSdkJwt;
   jwt: string;
@@ -44,6 +51,7 @@ export interface ResolvedFlow {
     source: string;
     kycApproved: boolean;
     proSubscription: boolean;
+    profile?: XummProfile;
   };
 }
 
@@ -264,10 +272,7 @@ export class XummPkceThread extends EventEmitter {
                                 JSON.stringify({ jwt: resp.access_token, me })
                               );
                             } catch (e) {
-                              log(
-                                "Could not persist JWT to local storage",
-                                e
-                              );
+                              log("Could not persist JWT to local storage", e);
                             }
                           }
 
@@ -308,10 +313,7 @@ export class XummPkceThread extends EventEmitter {
                   }
                 }, 750);
               } else {
-                log(
-                  "Unexpected message, skipping",
-                  postMessage?.source
-                );
+                log("Unexpected message, skipping", postMessage?.source);
               }
             } catch (e) {
               log("Error parsing message", (e as Error)?.message || e);
