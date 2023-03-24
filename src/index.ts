@@ -95,7 +95,7 @@ export class XummPkceThread extends EventEmitter {
 
   private jwt?: string;
 
-  private ping?: Promise<any>;
+  private ping?: ReturnType<XummSdkJwt['ping']>;
   private resolved = false;
   private resolvedSuccessfully?: boolean;
   private resolvePromise?: (result: ResolvedFlow) => void;
@@ -176,7 +176,7 @@ export class XummPkceThread extends EventEmitter {
 
         if (existingJwt?.jwt && typeof existingJwt.jwt === "string") {
           const sdk = new XummSdkJwt(existingJwt.jwt);
-          this.ping = sdk.ping();
+          this.ping = sdk.ping()
           this.ping
             .then(async (pong) => {
               /**
@@ -185,8 +185,8 @@ export class XummPkceThread extends EventEmitter {
               if (pong?.jwtData?.sub) {
                 // Yay, user still signed in, JWT still valid!
                 this.autoResolvedFlow = Object.assign(existingJwt, { sdk });
-                this.emit("retrieved");
                 await this.authorize();
+                this.emit("retrieved");
               } else {
                 this.logout();
               }
@@ -420,16 +420,15 @@ export class XummPkceThread extends EventEmitter {
   }
 
   public async authorize() {
-    if (this.options.rememberJwt) {
-      await Promise.race([this.ping, this.eventPromises.loggedout.promise]);
-    }
-    
     // Do not authorize twice
     if (this.resolvedSuccessfully) {
       return this.promise;
     }
-
+    
     this.resolved = false;
+    
+    await this.ping
+
     if (!this.mobileRedirectFlow && !this.autoResolvedFlow) {
       const url = this.authorizeUrl();
       const popup = window.open(

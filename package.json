@@ -1,6 +1,6 @@
 {
   "name": "xumm-oauth2-pkce",
-  "version": "2.7.7",
+  "version": "2.7.8",
   "description": "Xumm JS SDK for client side only OAuth2 PKCE (implicit flow) auth.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,7 +9,7 @@
     "clean": "rm -rf dist",
     "build": "tsc",
     "buildsample": "mkdir -p ./sample/dist; cp ./dist/browser.min.js ./sample/dist/",
-    "serve": "npm run build && npm run browserify && serve -C -n -p 3001 ./",
+    "serve": "npm run build && npm run browserify && serve -C -n -p 3002 ./",
     "watch": "tsc -w",
     "inspect": "clear && npm run build && node --inspect dist/samples/sample.js",
     "browserify": "browserify --standalone XummPkce -r ./dist/index.js:XummPkce |sed 's/\\(exports.XummPkce = XummPkce;\\)/\\1 module.exports = XummPkce;/g' > dist/browser.js && npm run minify",
