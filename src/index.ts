@@ -427,7 +427,11 @@ export class XummPkceThread extends EventEmitter {
     
     this.resolved = false;
     
-    await this.ping
+    try {
+      await this.ping
+    } catch (e) {
+      // Nope (prevent 401 error from API to bleed into auth flow)
+    }
 
     if (!this.mobileRedirectFlow && !this.autoResolvedFlow) {
       const url = this.authorizeUrl();
