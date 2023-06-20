@@ -28,7 +28,7 @@
     "debug": "^4.1.1",
     "events": "^3.3.0",
     "xumm-js-pkce": "^1.0.0",
-    "xumm-sdk": "^1.8.4"
+    "xumm-sdk": "^1.8.5"
   },
   "devDependencies": {
     "@types/debug": "^4.1.5",
