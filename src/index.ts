@@ -45,13 +45,17 @@ export interface ResolvedFlow {
     sub: string;
     picture: string;
     account: string;
-    name?: string;
-    domain?: string;
+    name?: string | null;
+    domain?: string | null;
     blocked: boolean;
     source: string;
     kycApproved: boolean;
     proSubscription: boolean;
     profile?: XummProfile;
+    networkType?: string;
+    networkId?: number;
+    networkEndpoint?: string;
+    email?: string;
   };
 }
 
